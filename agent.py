@@ -45,52 +45,52 @@ class AlphaBetAgent(Agent):
 		return self.player.getLegalActions(gameState)[index]
 
 
-		def max_value(self, gameState, curDepth, alpha, beta):
-			v = float('-inf')
+	def max_value(self, gameState, curDepth, alpha, beta):
+		v = float('-inf')
 
-			legalActions = self.player.getLegalActions(gameState)
-			counter = 0
+		legalActions = self.player.getLegalActions(gameState)
+		counter = 0
 
-			# Check if this is an end state and whether the depth has been reached
-			
-			if len(legalActions) == 0 or curDepth == 0:
-				return self.evaluationFunction(gameState), None
+		# Check if this is an end state and whether the depth has been reached
+		
+		if len(legalActions) == 0 or curDepth == 0:
+			return self.evaluationFunction(gameState), None
 
-			for i, action in enumerate(legalActions): 
-				successor = gameState.generateSuccessor(0, action)
+		for i, action in enumerate(legalActions): 
+			successor = gameState.generateSuccessor(0, action)
 
-			# Recurse if depth has not been reached
-			newv = max(v, self.min_value(successor, curDepth, alpha, beta))
+		# Recurse if depth has not been reached
+		newv = max(v, self.min_value(successor, curDepth, alpha, beta))
 
-			# keep track of the index of the best action
-			if newv != v: counter = i
+		# keep track of the index of the best action
+		if newv != v: counter = i
 
-			v = newv
+		v = newv
 
-			if v > beta: return v, counter # pruning
-			alpha = max(alpha, v)
+		if v > beta: return v, counter # pruning
+		alpha = max(alpha, v)
 
-			return v, counter
+		return v, counter
 
-		def min_value(self, gameState, curDepth, alpha, beta):
-			v = float(inf)
+	def min_value(self, gameState, curDepth, alpha, beta):
+		v = float(inf)
 
-			legalActions = self.player.getLegalActions(gameState)
+		legalActions = self.player.getLegalActions(gameState)
 
-			# Check if this is an end state
-			if len(legalActions) == 0:
-				return self.evaluationFunction(gameState)
+		# Check if this is an end state
+		if len(legalActions) == 0:
+			return self.evaluationFunction(gameState)
 
-			for action in legalActions:
-				successor = gameState.getSuccessor(action)
+		for action in legalActions:
+			successor = gameState.getSuccessor(action)
 
-			# Switch to MAX agent
-			v = min(v, self.max_value(successor, curDepth-1, alpha, beta)[0])
+		# Switch to MAX agent
+		v = min(v, self.max_value(successor, curDepth-1, alpha, beta)[0])
 
-			if v < alpha: return v # pruning
-			beta = min(beta, v)
+		if v < alpha: return v # pruning
+		beta = min(beta, v)
 
-			return v
+		return v
 
 
 class ExpectimaxAgent(Agent):
