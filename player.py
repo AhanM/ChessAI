@@ -19,7 +19,9 @@ class Player(object):
 		self.check = False
 
 		self.pieces = pieces
-		self.king = pieces[0]
+		for piece in pieces:
+			if piece.toString() == "K":
+				self.king = piece
 		# self.enemyPieces = enemyPieces
 
 		if color == "White": 
@@ -45,6 +47,7 @@ class Player(object):
 			nextState = state.getSuccessor(action)
 			if self.kingUnderAttack(nextState):
 				moves.remove(action)
+				state.pinnedPieces += 1
 
 		return moves
 

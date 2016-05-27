@@ -56,7 +56,8 @@ class State(object):
 	def __init__(self):
 		super(State, self).__init__()
 		self.capturedPieces = []
-		
+		self.pinnedPieces = 0
+
 		# Initialize pieces
 		k = King("White", (4,0), 0)
 		q = Queen("White", (3,0), 1)
@@ -150,22 +151,39 @@ class State(object):
 			else:
 				successorState.config.blackPieces.remove(capturedPiece)
 
-		piece = action.piece
+		# Pawn Promotion
+		if action.promotion:
+			char = raw_input("Pawn Promotion: ")
 
-		char = piece.toString()
+			if char == "N":
+				newPiece = Knight(piece.color, action.newPos, piece.index)
+			elif char == 'B':
+				newPiece = Bishop(piece.color, action.newPos, piece.index)
+			elif char == 'R':
+				newPiece = Rook(piece.color, action.newPos, piece.index)
+			elif char == 'Q':
+				newPiece = Queen(piece.color, action.newPos, piece.index)
 
-		if char == "P":
-			newPiece = Pawn(piece.color, action.newPos, piece.index)
-		elif char == "N":
-			newPiece = Knight(piece.color, action.newPos, piece.index)
-		elif char == 'B':
-			newPiece = Bishop(piece.color, action.newPos, piece.index)
-		elif char == 'R':
-			newPiece = Rook(piece.color, action.newPos, piece.index)
-		elif char == 'Q':
-			newPiece = Queen(piece.color, action.newPos, piece.index)
 		else:
-			newPiece = King(piece.color, action.newPos, piece.index)
+
+			piece = action.piece
+
+			char = piece.toString()
+
+			if char == "P":
+				newPiece = Pawn(piece.color, action.newPos, piece.index)
+			elif char == "N":
+				newPiece = Knight(piece.color, action.newPos, piece.index)
+			elif char == 'B':
+				newPiece = Bishop(piece.color, action.newPos, piece.index)
+			elif char == 'R':
+				newPiece = Rook(piece.color, action.newPos, piece.index)
+			elif char == 'Q':
+				newPiece = Queen(piece.color, action.newPos, piece.index)
+			else:
+				newPiece = King(piece.color, action.newPos, piece.index)
+
+		newPiece.lastpos = piece.pos
 
 		if piece.color == "White":
 
@@ -231,3 +249,12 @@ class State(object):
 
 		return False
 
+class GameState(object):
+	"""
+	A much simpler and minimalistic representation of the Game State for 
+	the purpose of reducing time for MiniMax and ExpectiMax Agents
+	"""
+	def __init__(self, arg):
+		super(GameState, self).__init__()
+		self.arg = arg
+		

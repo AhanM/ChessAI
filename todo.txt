@@ -1,4 +1,0 @@
-# Missing Features:
- - Castling ( Read up rules )
- - Special Pawn Attack ( Read up rules )
- - Pawn Promotion

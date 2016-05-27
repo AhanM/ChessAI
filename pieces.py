@@ -18,6 +18,7 @@ class Piece(object):
 		self.color = color
 		self.pos = self.x, self.y = x,y
 		self.index = index
+		self.lastpos = None
 
 	
 	def validMoves(self, config):
@@ -44,39 +45,72 @@ class Pawn(Piece):
 		
 		self.player_pieces_pos = config.getPlayerPositions(self.color)
 		self.enemy_pieces_pos = config.getEnemyPositions(self.color)
+		self.enemy_pieces = config.getEnemyPieces(self.color)
 
 		if self.color == "White":
 			# moving pawn one tile in front
-			if util.isNotOutofBounds(x,y+1):
+			if util.isNotOutofBounds(x,y+1) and (x,y+1) not in self.player_pieces_pos+self.enemy_pieces_pos:
 				valid_moves.append((x,y+1)) 
 			# moving pawn two tiles in front
-			if y == 1:
+			if y == 1 and (x,y+1) not in self.player_pieces_pos+self.enemy_pieces_pos and (x,y+2) not in self.player_pieces_pos+self.enemy_pieces_pos:
 				valid_moves.append((x,y+2))
 
 			# Attacking diagonally 1 -> Normal Attack
+			if util.isNotOutofBounds((x+1), (y+1)) and ((x+1), (y+1)) in self.enemy_pieces_pos:
+				valid_moves.append((x+1,y+1))
+			if util.isNotOutofBounds((x-1), (y+1)) and ((x-1), (y+1)) in self.enemy_pieces_pos:
+				valid_moves.append((x-1, y+1))
 
-			# Attacking diagonally 2 -> When opponent pawn moves two in front
+			# Attacking diagonally 2 -> en passant
+			if util.isNotOutofBounds((x+1),y) and ((x+1),y) in self.enemy_pieces_pos:
+				index = util.getIndexof(self.enemy_pieces_pos, (x+1,y))
+				enemyPiece = self.enemy_pieces[index]
+				if enemyPiece.toString() == "P" and abs(enemyPiece.lastpos[1] - enemyPiece.pos[1]) == 2:
+					valid_moves.append((x+1,y+1))
+
+			if util.isNotOutofBounds((x-1),y) and ((x-1),y) in self.enemy_pieces_pos:
+				index = util.getIndexof(self.enemy_pieces_pos, (x-1,y))
+				enemyPiece = self.enemy_pieces[index]
+				if enemyPiece.toString() == "P" and abs(enemyPiece.lastpos[1] - enemyPiece.pos[1]) == 2:
+					valid_moves.append((x-1,y+1))
 
 		else:
 			# moving pawn one tile in front
-			if util.isNotOutofBounds(x,y-1):
+			if util.isNotOutofBounds(x,y-1) and (x,y-1) not in self.player_pieces_pos+self.enemy_pieces_pos: 
 					valid_moves.append((x,y-1))
 
 			# moving pawn two tiles in front
-			if y == 6:
-				if (x,y-1) not in self.player_pieces_pos+self.enemy_pieces_pos:
+			if y == 6 and (x,y-1) not in self.player_pieces_pos+self.enemy_pieces_pos and (x,y-2) not in self.player_pieces_pos+self.enemy_pieces_pos:
 					valid_moves.append((x,y-2))
 
 			# Attacking diagonally 1 -> Normal Attack
+			if util.isNotOutofBounds((x-1), (y-1)) and ((x-1), (y-1)) in self.enemy_pieces_pos:
+				valid_moves.append((x-1,y-1))
+			if util.isNotOutofBounds((x+1), (y-1)) and ((x+1), (y-1)) in self.enemy_pieces_pos:
+				valid_moves.append((x+1, y-1))
 
-			# Attacking diagonally 2 -> When opponent pawn moves two in front
+			# Attacking diagonally 2 -> en passant
+			if util.isNotOutofBounds((x+1),y) and ((x+1),y) in self.enemy_pieces_pos:
+				index = util.getIndexof(self.enemy_pieces_pos, (x+1,y))
+				enemyPiece = self.enemy_pieces[index]
+				if enemyPiece.toString() == "P" and abs(enemyPiece.lastpos[1] - enemyPiece.pos[1]) == 2:
+					valid_moves.append((x+1,y-1))
 
-		# Pawn Promotion?
+			if util.isNotOutofBounds((x-1),y) and ((x-1),y) in self.enemy_pieces_pos:
+				index = util.getIndexof(self.enemy_pieces_pos, (x-1,y))
+				enemyPiece = self.enemy_pieces[index]
+				if enemyPiece.toString() == "P" and abs(enemyPiece.lastpos[1] - enemyPiece.pos[1]) == 2:
+					valid_moves.append((x-1,y-1))
 
 		for (newx,newy) in valid_moves:
 			# Check for collisions
 			action = Action(self, (newx,newy), config)
+
 			if not action.isValid(): valid_moves.remove((newx,newy))
+
+			# Pawn Promotion?
+			if newy == 7 or newy == 0:
+				action.promotion = True
 
 		return valid_moves
 

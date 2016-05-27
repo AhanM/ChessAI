@@ -17,6 +17,8 @@ class Action(object):
 
 		self.color = piece.color
 
+		self.promotion = False # For Pawn Promotion
+
 		self.player_pieces = config.getPlayerPieces(self.color)
 		self.enemy_pieces = config.getEnemyPieces(self.color)
 
